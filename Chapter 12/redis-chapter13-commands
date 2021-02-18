@@ -1,0 +1,144 @@
+Using Redis CLI
+Once you install Redis you can run the Redis-CLI program. By default, it connects to the server at 127.0.0.1 default port 6379. If you want to connect to a remote Redis instance or a different port, you can specify a different hostname or an IP address using -h. In order to set a different port, use -p. Here’s an example:
+
+$ redis-cli -h redis-database.mydomain.in -p 6379
+127.0.0.1:6379> PING
+PONG
+
+To get information about your Redis instance, you can execute the INFO command with a specific section or by default, it can return all the sections with information.
+
+127.0.0.1:6379> INFO keyspace
+# Keyspace
+db0:keys=61,expires=0,avg_ttl=0
+db1:keys=5,expires=0,avg_ttl=0
+
+127.0.0.1:6379> INFO server
+# Server
+redis_version:5.0.4
+redis_git_sha1:00000000
+redis_git_dirty:0
+redis_build_id:42f2e7e3da9babed
+redis_mode:standalone
+os:Linux 4.4.0-18362-Microsoft x86_64
+arch_bits:64
+multiplexing_api:epoll
+atomicvar_api:atomic-builtin
+gcc_version:7.3.0
+process_id:19
+run_id:1c9dca270806e3364931d0d40590ccdcef5fd06a
+tcp_port:6379
+uptime_in_seconds:352429
+uptime_in_days:4
+hz:10
+configured_hz:10
+lru_clock:124904
+executable:/home/suyog/redis-server
+config_file:
+
+The --stat option is used to monitor Redis instances in real time:
+suyog@Suyog-X1Carbon:~$ redis-cli --stat
+------- data ------ --------------------- load -------------------- - child -
+keys       mem      clients blocked requests            connections
+66         901.77K  2       0       93 (+0)             15
+66         901.77K  2       0       94 (+1)             15
+66         901.77K  2       0       95 (+1)             15
+
+
+
+You can also use command stats to see Redis commands statistics. The section provides statistics based on the command type, including the number of calls, the total CPU time consumed by these commands, and the average CPU consumed per command execution.
+
+127.0.0.1:6379> info commandstats
+# Commandstats
+cmdstat_hlen:calls=17,usec=51,usec_per_call=3.00
+cmdstat_command:calls=4,usec=10019,usec_per_call=2504.75
+cmdstat_ping:calls=5,usec=16,usec_per_call=3.20
+cmdstat_dbsize:calls=1,usec=5,usec_per_call=5.00
+cmdstat_zcard:calls=3,usec=20,usec_per_call=6.67
+cmdstat_module:calls=1,usec=2,usec_per_call=2.00
+cmdstat_strlen:calls=43,usec=116,usec_per_call=2.70
+cmdstat_slowlog:calls=1,usec=12,usec_per_call=12.00
+cmdstat_xlen:calls=1,usec=8,usec_per_call=8.00
+cmdstat_client:calls=10,usec=94,usec_per_call=9.40
+cmdstat_sadd:calls=2,usec=30,usec_per_call=15.00
+cmdstat_hmset:calls=5,usec=53,usec_per_call=10.60
+cmdstat_sync:calls=1,usec=25460,usec_per_call=25460.00
+cmdstat_scan:calls=9,usec=201,usec_per_call=22.33
+cmdstat_scard:calls=2,usec=14,usec_per_call=7.00
+cmdstat_smembers:calls=1,usec=18,usec_per_call=18.00
+cmdstat_ttl:calls=2,usec=5,usec_per_call=2.50
+cmdstat_info:calls=46,usec=5960,usec_per_call=129.57
+cmdstat_memory:calls=2,usec=4,usec_per_call=2.00
+cmdstat_type:calls=65,usec=185,usec_per_call=2.85
+cmdstat_hgetall:calls=2,usec=17,usec_per_call=8.50
+cmdstat_config:calls=1,usec=102,usec_per_call=102.00
+cmdstat_select:calls=3,usec=5,usec_per_call=1.67
+cmdstat_getrange:calls=1,usec=9,usec_per_call=9.00
+cmdstat_hscan:calls=1,usec=40,usec_per_call=40.00
+
+
+Here, we have tried commands and their total calls at runtime:
+suyog@Suyog-X1Carbon:~$ redis-cli info commandstats | grep "cmdstat_" | sed -e 's/[:,=]/,/g' | sort -n -k 3rn -t ',' | sed -e 's/cmdstat_//g' | awk -F ',' -v OFS=',' 'NR==1 {print "command,operations,usec_per_op"}{print $1,$3,$7}'
+command,operations,usec_per_op
+info,45,128.80
+client,10,9.40
+hmset,5,10.60
+ping,5,3.20
+type,4,4.50
+command,3,2776.00
+select,3,1.67
+strlen,3,3.00
+hgetall,2,8.50
+memory,2,2.00
+sadd,2,15.00
+scan,2,37.00
+ttl,2,2.50
+config,1,102.00
+getrange,1,9.00
+hlen,1,3.00
+hscan,1,40.00
+module,1,2.00
+scard,1,5.00
+slowlog,1,12.00
+smembers,1,18.00
+sync,1,25460.00
+
+
+
+Using bigkeys, it scans the dataset for big keys but also provides information about the data types that the data set consists:
+
+suyog@Suyog-X1Carbon:~$ redis-cli --bigkeys
+
+# Scanning the entire keyspace to find the biggest keys as well as
+# average sizes per key type.  You can use -i 0.1 to sleep 0.1 sec
+# per 100 SCAN commands (not usually needed).
+
+[00.00%] Biggest hash   found so far 'category:3:product:4' with 5 fields
+[00.00%] Biggest string found so far 'Order:524' with 886 bytes
+[00.00%] Biggest zset   found so far 'category' with 4 members
+[00.00%] Biggest hash   found so far 'idx:by_name' with 6 fields
+[16.39%] Biggest string found so far 'Order:john' with 1433 bytes
+[16.39%] Biggest string found so far 'Order:523532' with 1997 bytes
+[16.39%] Biggest stream found so far 'mystream' with 18 entries
+[67.21%] Biggest set    found so far 'person-imei:9826160729' with 3 members
+[67.21%] Biggest string found so far 'Order:634262' with 2029 bytes
+
+-------- summary -------
+
+Sampled 61 keys in the keyspace!
+Total key length in bytes is 872 (avglen 14.30)
+
+Biggest   hash found 'idx:by_name' has 6 fields
+Biggest string found 'Order:634262' has 2029 bytes
+Biggest stream found 'mystream' has 18 entries
+Biggest    set found 'person-imei:9826160729' has 3 members
+Biggest   zset found 'category' has 4 members
+
+0 lists with 0 items (00.00% of keys, avg size 0.00)
+16 hashs with 67 fields (26.23% of keys, avg size 4.19)
+40 strings with 37770 bytes (65.57% of keys, avg size 944.25)
+1 streams with 18 entries (01.64% of keys, avg size 18.00)
+1 sets with 3 members (01.64% of keys, avg size 3.00)
+3 zsets with 7 members (04.92% of keys, avg size 2.33)
+
+
+
