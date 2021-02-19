@@ -16,5 +16,5 @@ This book begins with teaching you to set up your own Redis environment, followe
 
 ## Related Products
 * [Learn SQL with MySQL](https://bpbonline.com/products/sql-with-mysql-relational-database-book-ebook?_pos=1&_sid=eccdad841&_ss=r)
-* [Mastering PL/SQL Through Illustrations](https://bpbonline.com/products/sql-with-mysql-relational-database-book-ebook?_pos=1&_sid=eccdad841&_ss=r)
+* [Mastering PL/SQL Through Illustrations](https://bpbonline.com/products/mastering-pl-sql-through-illustrations?_pos=1&_sid=d3cffae70&_ss=r)
 * [Big Data Hadoop Interview Guide](https://bpbonline.com/products/big-data-hadoop-interview-guide-1?_pos=1&_sid=e932f0112&_ss=r)
